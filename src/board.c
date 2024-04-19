@@ -99,6 +99,7 @@ static Piece *createNewPiece()
     for (int i = 0; i < 16; i++) e->takeable[i] = 0;
     e->castle = false;
     e->id = 0;
+    e->hasMoved = false;
     return e;
 }
 
@@ -116,21 +117,18 @@ void displayBoard(Piece *board[8][8])
 {
     printf("format: pieceType playerColor id\n");
     for (int i = 0; i < 8; i++) {
+                    printf("%d ", 8 - i);
         for (int j = 0; j < 8; j++) {
             // Ensure each field has a fixed width
             if (board[i][j] == NULL) {
                 printf("|   ");
             } else {
-                printf("|%c%2d", board[i][j]->color == white ? 'W' : 'B', board[i][j]->pieceType);
+                printf("|%c%2c", board[i][j]->color == white ? 'w' : 'b', board[i][j]->pieceType);
             }
-            //printf("|%d", board[i][j]->pieceType);
         }
-        printf("|\n");
-        // for(int j = 0; j < 8; j++) {
-        // printf("|%2d %2d %2d", board[i][j]->rank, board[i][j]->file, board[i][j]->isPiece);
-        // }
-        // printf("\n\n");
+            printf("|\n");
     }
+            printf("    a   b   c   d   e   f   g   h\n");
 }
 
 

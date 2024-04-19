@@ -1,41 +1,42 @@
 #include "game.h"
 #include <stdio.h>
 #include <stdbool.h>
+#include <string.h>
 
 int main() {
     Piece *board[8][8];
-    enum PlayerColor mux = white;
+    enum PlayerColor p1Color = white;
+    enum PlayerColor otherPlayer = p1Color == white ? black : white;
     unsigned char startFile = ' ';
     unsigned int startRank = ' ';
     unsigned char endFile = ' ';
     unsigned int endRank = ' ';
 
 
-    initializeBoard(board, mux);
-    displayBoard(board);
-    printf("white's move\n");
+    initializeBoard(board, p1Color);
     for (int i = 0; i < 4; i++) {
-        enum PlayerColor otherPlayer = mux == white ? black : white;
-        scanf(" %c", &startFile);
-        scanf(" %d", &startRank);
-        scanf(" %c", &endFile);
-        scanf(" %d", &endRank);
-        movePiece(board, mux, startFile, startRank, endFile, endRank);
-        flipBoard(board);
+        do {
         displayBoard(board);
+        printf("white's move\n");
         scanf(" %c", &startFile);
         scanf(" %d", &startRank);
         scanf(" %c", &endFile);
         scanf(" %d", &endRank);
-        movePiece(board, otherPlayer, startFile, startRank, endFile, endRank);
-        printf("piece moved\n");
-        flipBoard(board);
-        printf("board flipped\n");
+        }
+        while (!movePiece(board, p1Color, p1Color, startFile, startRank, endFile, endRank));
+
+        do {
+        displayBoard(board);
+        printf("black's move\n");
+        scanf(" %c", &startFile);
+        scanf(" %d", &startRank);
+        scanf(" %c", &endFile);
+        scanf(" %d", &endRank);
+        }
+        while (!movePiece(board, otherPlayer, p1Color, startFile, startRank, endFile, endRank));
         displayBoard(board);
     }
 
 
-    //flipBoard(board);
-    //displayBoard(board);
     return 0;
 }

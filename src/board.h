@@ -4,6 +4,7 @@
 #define BOARD_H
 #endif
 
+
 enum PlayerColor
 {
     noColor,
@@ -15,12 +16,12 @@ enum PlayerColor
 enum character
 {
     noChar,
-    King,
-    Queen,
-    Knight,
-    Bishop,
-    Rook,
-    Pawn
+    King = 'K',
+    Queen = 'Q',
+    Knight = 'K',
+    Bishop = 'B',
+    Rook = 'R',
+    Pawn = 'P'
 };
 
 typedef struct
@@ -35,6 +36,7 @@ typedef struct
     bool castle;
     int takeable[16]; /*can determine which piece is attacking the concerning piece*/
     unsigned char id;
+    bool hasMoved;
 
 }Piece;
 

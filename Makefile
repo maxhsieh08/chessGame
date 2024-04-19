@@ -18,5 +18,5 @@ src/game.o: src/game.c src/game.h
 	$(CC) $(CFLAGS) -c src/game.c -o src/game.o
 
 src/main.o: src/main.c src/game.h
-	$(CC) $(CFLAGS) -c src/main.c -o main.o
+	$(CC) $(CFLAGS) -c src/main.c -o src/main.o
 
