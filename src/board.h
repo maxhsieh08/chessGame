@@ -18,7 +18,7 @@ enum character
     noChar,
     King = 'K',
     Queen = 'Q',
-    Knight = 'K',
+    Knight = 'N',
     Bishop = 'B',
     Rook = 'R',
     Pawn = 'P'

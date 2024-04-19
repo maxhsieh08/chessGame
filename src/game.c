@@ -4,35 +4,44 @@
 #include <stdlib.h>
 static unsigned int fileToIndex (unsigned char File);
 
-bool movePiece(Piece *board[8][8], enum PlayerColor pColor, enum PlayerColor p1Color, unsigned int startFile, unsigned int startRank, unsigned int endFile, unsigned int endRank) {
-    unsigned int fileIndex1 = fileToIndex(startFile);
-    unsigned int fileIndex2 = fileToIndex(endFile);
-    unsigned int rankIndex1 = 8 - startRank;
-    unsigned int rankIndex2 = 8 - endRank;
-    //printf("starting file: %d\nstarting rank: %d\nend file: %d\nend rank: %d\n", fileIndex1, rankIndex1, fileIndex2, rankIndex2);
-    if (isValidMove(board, pColor, fileIndex1, rankIndex1, fileIndex2, rankIndex2)) {
-        Piece *temp = board[rankIndex1][fileIndex1];
-        switch(temp->pieceType) {
-            case Pawn: 
+bool movePiece(Piece *board[8][8], enum PlayerColor currentPlayer, enum PlayerColor playerOne, unsigned int startFile, unsigned int startRank, unsigned int endFile, unsigned int endRank) {
+    unsigned int startFileIndex = fileToIndex(startFile);
+    unsigned int endFileIndex = fileToIndex(endFile);
+    unsigned int startRankIndex = 8 - startRank;
+    unsigned int endRankIndex = 8 - endRank;
+    //printf("starting file: %d\nstarting rank: %d\nend file: %d\nend rank: %d\n", startFileIndex, startRankIndex, endFileIndex, endRankIndex);
+    if (isValidMove(board, currentPlayer, startFileIndex, startRankIndex, endFileIndex, endRankIndex)) {
+        Piece *temp = board[startRankIndex][startFileIndex];
+        bool isMoveValid = false;
+        switch (temp->pieceType) {
+            case Pawn:
                 printf("testing Pawn!\n");
-                if (validPawnMove(board, pColor, p1Color, fileIndex1, rankIndex1, fileIndex2, rankIndex2)) {
-                    printf("valid pawn move!\n");
-                    temp->hasMoved = 1;
-                    board[rankIndex2][fileIndex2] = temp;
-                    board[rankIndex1][fileIndex1] = NULL;
-                     return true;
-                }
-            default: 
+                isMoveValid = validPawnMove(board, currentPlayer, playerOne, startFileIndex, startRankIndex, endFileIndex, endRankIndex);
+                break;
+            case Rook:
+                printf("testing Rook!\n");
+                isMoveValid = validRookMove(board, startFileIndex, startRankIndex, endFileIndex, endRankIndex);
+                break;
+            default:
                 printf("still implementing other piece types\n");
                 break;
         }
+
+        if (isMoveValid) {
+            printf("valid %s move!\n", temp->pieceType == Pawn ? "pawn" : "rook"); // Adjusted dynamically for other types as implemented
+            temp->hasMoved = 1;
+            board[endRankIndex][endFileIndex] = temp;
+            board[startRankIndex][startFileIndex] = NULL;
+            return true;
+        }
+        return false;
     } else printf("not valid, try again! \n");
     return false;
 }
 
 /*checks if piece is NULL, then tests if matches player's color.*/
 /*also tests if move is within bounds of board as well as if it is attempting to take a friendly piece*/
-bool isValidMove(Piece *board[8][8], enum PlayerColor pColor, unsigned int startFileIndex, unsigned int startRankIndex, unsigned char endFileIndex, unsigned int endRankIndex) {
+bool isValidMove(Piece *board[8][8], enum PlayerColor currentPlayer, unsigned int startFileIndex, unsigned int startRankIndex, unsigned char endFileIndex, unsigned int endRankIndex) {
     bool isValid = 1; // Variable to track if any errors are found
     // Check the start file index
     if (startFileIndex < 0 || startFileIndex > 8) {
@@ -64,48 +73,71 @@ bool isValidMove(Piece *board[8][8], enum PlayerColor pColor, unsigned int start
     if (testPiece == NULL) {
         printf("no piece here!\n");
         isValid = 0;
-    } else if (testPiece->color != pColor) {
-        printf("attempting to move enemy piece\n");
+    } else if (testPiece->color != currentPlayer) {
+        printf("attempting to move enemy piece!\n");
         isValid = 0;
     }
     /*check if moving onto friendly piece*/
-    if(board[endRankIndex][endFileIndex] != NULL && board[endRankIndex][endFileIndex]->color == pColor) {
+    if(board[endRankIndex][endFileIndex] != NULL && board[endRankIndex][endFileIndex]->color == currentPlayer) {
         printf("attempting to take friendly piece!\n");
         isValid = 0;
     }
     return isValid;
 }
 
-bool validPawnMove(Piece *board[8][8], enum PlayerColor pColor, enum PlayerColor p1Color, unsigned int startFileIndex, unsigned int startRankIndex, unsigned char endFileIndex, unsigned int endRankIndex) {
-    enum PlayerColor otherColor = pColor == white ? black : white;
-    Piece *testPiece = board[startRankIndex][startFileIndex];
-    Piece *destination = board[endRankIndex][endFileIndex];
+bool validPawnMove(Piece *board[8][8], enum PlayerColor currentPlayer, enum PlayerColor playerOne, unsigned int startFileIndex, unsigned int startRankIndex, unsigned char endFileIndex, unsigned int endRankIndex) {
+    enum PlayerColor opponentColor = (currentPlayer == white) ? black : white;
+    Piece *movingPiece = board[startRankIndex][startFileIndex];
+    Piece *destinationPiece = board[endRankIndex][endFileIndex];
+
+    // Calculate rank difference considering the player's movement direction
     unsigned int rankDiff;
-    /*calculate the difference in rank which takes into account how the board is oriented and wraparound of unsigned int*/
-    if (pColor == p1Color) {
-        if (startRankIndex >= endRankIndex) {
-            rankDiff = startRankIndex - endRankIndex;
-        } else rankDiff = 0;
+    if (currentPlayer == playerOne) {
+        rankDiff = (startRankIndex >= endRankIndex) ? (startRankIndex - endRankIndex) : 0;
     } else {
-        if (endRankIndex >= startRankIndex) {
-            rankDiff = endRankIndex - startRankIndex;
-        } else rankDiff = 0;
+        rankDiff = (endRankIndex >= startRankIndex) ? (endRankIndex - startRankIndex) : 0;
     }
-    unsigned int maxRankDiff = testPiece->hasMoved ? 1 : 2; // If moved, max diff is 1; if not, it's 2
-    unsigned int fileDiff = startFileIndex > endFileIndex ? 
-               startFileIndex - endFileIndex : 
-               endFileIndex - startFileIndex;
-    if(destination!= NULL && destination->color == otherColor) {
-        if(otherColor && rankDiff == 1 && fileDiff == 1) {
-            return true;
-        } else return false;
+
+    unsigned int fileDiff = abs((int)endFileIndex - (int)startFileIndex);
+    
+    // Ensure the pawn moves forward
+    if (rankDiff == 0) return false;
+
+    // Maximum rank difference based on whether the pawn has moved before
+    unsigned int maxRankDiff = movingPiece->hasMoved ? 1 : 2;
+
+    // Capture logic
+    if (destinationPiece != NULL && destinationPiece->color == opponentColor) {
+        return (rankDiff == 1 && fileDiff == 1);
     }
-    /*check if pawn is attempting to jump over a piece*/
-    if (rankDiff == 2 && board[(startRankIndex + endRankIndex)/2][startFileIndex] != NULL) return false;
-    if (startFileIndex == endFileIndex && rankDiff > 0 && rankDiff <= maxRankDiff) return true;
 
-    return false;
+    // check that pawn is not jumping over pieces
+    if (rankDiff == 2 && board[(startRankIndex + endRankIndex) / 2][startFileIndex] != NULL) {
+        return false;
+    }
 
+    // Regular move forward
+    return fileDiff == 0 && rankDiff > 0 && rankDiff <= maxRankDiff;
+}
+
+bool validRookMove(Piece *board[8][8], unsigned int startFileIndex, unsigned int startRankIndex, unsigned char endFileIndex, unsigned int endRankIndex) {
+    /*check if either rank or file is the same. if not, return false*/
+    if (startFileIndex != endFileIndex && startRankIndex != endRankIndex) return false;
+    // Determine the direction of the move
+    int rankDirection = (endRankIndex > startRankIndex) ? 1 : (endRankIndex < startRankIndex) ? -1 : 0;
+    int fileDirection = (endFileIndex > startFileIndex) ? 1 : (endFileIndex < startFileIndex) ? -1 : 0;
+
+    // Check for blockages in the path
+    unsigned int checkFile = startFileIndex + fileDirection;
+    unsigned int checkRank = startRankIndex + rankDirection;
+    while (checkFile != endFileIndex || checkRank != endRankIndex) {
+        if (board[checkRank][checkFile] != NULL) {
+            return false; // There is a blockage
+        }
+        checkFile += fileDirection;
+        checkRank += rankDirection;
+    }
+    return true;
 }
 
 static unsigned int fileToIndex(unsigned char File) {

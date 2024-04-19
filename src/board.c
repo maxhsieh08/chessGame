@@ -80,6 +80,7 @@ void initializeBoard(Piece *board[8][8], enum PlayerColor p1Color)
     board[7][4]->color = p1Color;
 }
 
+/* Create new pieces for initialization of board*/
 static Piece *createNewPiece()
 {
     Piece *e;
@@ -109,13 +110,12 @@ static void deletePiece(Piece *e)
     free(e);
     
 }
-/* Create new pieces for initialization of board*/
 
 
 /*Displaying the board in the terminal*/
 void displayBoard(Piece *board[8][8])
 {
-    printf("format: pieceType playerColor id\n");
+    printf("format: playerColor pieceType\n");
     for (int i = 0; i < 8; i++) {
                     printf("%d ", 8 - i);
         for (int j = 0; j < 8; j++) {
