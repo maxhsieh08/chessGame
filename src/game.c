@@ -22,6 +22,11 @@ bool movePiece(Piece *board[8][8], enum PlayerColor currentPlayer, enum PlayerCo
                 printf("testing Rook!\n");
                 isMoveValid = validRookMove(board, startFileIndex, startRankIndex, endFileIndex, endRankIndex);
                 break;
+            /*other piece type moevements*/
+            case Bishop:
+            case Knight:
+            case Queen:
+            case King:
             default:
                 printf("still implementing other piece types\n");
                 break;
