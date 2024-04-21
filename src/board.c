@@ -117,18 +117,18 @@ void displayBoard(Piece *board[8][8])
 {
     printf("format: playerColor pieceType\n");
     for (int i = 0; i < 8; i++) {
-                    printf("%d ", 8 - i);
+                    printf("\033[0m%d ", 8 - i);
         for (int j = 0; j < 8; j++) {
             // Ensure each field has a fixed width
             if (board[i][j] == NULL) {
-                printf("|   ");
+                printf("|___");
             } else {
-                printf("|%c%2c", board[i][j]->color == white ? 'w' : 'b', board[i][j]->pieceType);
+                printf("|\033[4m%c%2c", board[i][j]->color == white ? 'w' : 'b', board[i][j]->pieceType);
             }
         }
             printf("|\n");
     }
-            printf("    a   b   c   d   e   f   g   h\n");
+            printf("\033[0m    a   b   c   d   e   f   g   h\n");
 }
 
 

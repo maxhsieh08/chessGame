@@ -9,7 +9,6 @@ bool movePiece(Piece *board[8][8], enum PlayerColor currentPlayer, enum PlayerCo
     unsigned int endFileIndex = fileToIndex(endFile);
     unsigned int startRankIndex = 8 - startRank;
     unsigned int endRankIndex = 8 - endRank;
-    //printf("starting file: %d\nstarting rank: %d\nend file: %d\nend rank: %d\n", startFileIndex, startRankIndex, endFileIndex, endRankIndex);
     if (isValidMove(board, currentPlayer, startFileIndex, startRankIndex, endFileIndex, endRankIndex)) {
         Piece *temp = board[startRankIndex][startFileIndex];
         bool isMoveValid = false;
@@ -24,8 +23,17 @@ bool movePiece(Piece *board[8][8], enum PlayerColor currentPlayer, enum PlayerCo
                 break;
             /*other piece type moevements*/
             case Bishop:
+                printf("testing Bishop!\n");
+                isMoveValid = validBishopMove(board, startFileIndex, startRankIndex, endFileIndex, endRankIndex);
+                break;
             case Knight:
+                printf("testing Knight!\n");
+                isMoveValid = validKnightMove(startFileIndex, startRankIndex, endFileIndex, endRankIndex);
+                break;
             case Queen:
+                printf("testing Queen!\n");
+                isMoveValid = validQueenMove(board, startFileIndex, startRankIndex, endFileIndex, endRankIndex);
+                break;
             case King:
             default:
                 printf("still implementing other piece types\n");
@@ -33,7 +41,7 @@ bool movePiece(Piece *board[8][8], enum PlayerColor currentPlayer, enum PlayerCo
         }
 
         if (isMoveValid) {
-            printf("valid %s move!\n", temp->pieceType == Pawn ? "pawn" : "rook"); // Adjusted dynamically for other types as implemented
+            printf("valid %s move!\n", temp->pieceType == Pawn ? "pawn" : (temp->pieceType == Rook ? "rook" : (temp->pieceType == Bishop) ? "bishop" : (temp->pieceType == Queen) ? "queen" : (temp->pieceType == Knight) ? "knight" : "king"));
             temp->hasMoved = 1;
             board[endRankIndex][endFileIndex] = temp;
             board[startRankIndex][startFileIndex] = NULL;
@@ -49,6 +57,10 @@ bool movePiece(Piece *board[8][8], enum PlayerColor currentPlayer, enum PlayerCo
 bool isValidMove(Piece *board[8][8], enum PlayerColor currentPlayer, unsigned int startFileIndex, unsigned int startRankIndex, unsigned char endFileIndex, unsigned int endRankIndex) {
     bool isValid = 1; // Variable to track if any errors are found
     // Check the start file index
+    if (startFileIndex == endFileIndex && startRankIndex == endRankIndex){
+        printf("attempting to move to the same square!\n");
+        isValid = 0;
+    }
     if (startFileIndex < 0 || startFileIndex > 8) {
         printf("Invalid start file index: %d\n", startFileIndex);
         isValid = 0; // Mark that an error was found
@@ -144,7 +156,62 @@ bool validRookMove(Piece *board[8][8], unsigned int startFileIndex, unsigned int
     }
     return true;
 }
+/*NEEDS MORE TESTING*/
+bool validBishopMove (Piece *board[8][8], unsigned int startFileIndex, unsigned int startRankIndex, unsigned char endFileIndex, unsigned int endRankIndex) {
+    if (startFileIndex == endFileIndex || startRankIndex == endRankIndex) return false;
 
+    /* check if ranke and file difference are the same, if not return false*/
+    int fileDiff = (int)endFileIndex - (int)startFileIndex;
+    int rankDiff = (int)endRankIndex - (int)startRankIndex;
+
+    if(rankDiff != fileDiff) return false;
+
+    int rankDirection = (endRankIndex > startRankIndex) ? 1 : (endRankIndex < startRankIndex) ? -1 : 0;
+    int fileDirection = (endFileIndex > startFileIndex) ? 1 : (endFileIndex < startFileIndex) ? -1 : 0;
+
+    // Check for blockages in the path
+    unsigned int checkFile = startFileIndex + fileDirection;
+    unsigned int checkRank = startRankIndex + rankDirection;
+    while (checkFile != endFileIndex || checkRank != endRankIndex) {
+        if (board[checkRank][checkFile] != NULL) {
+            return false; // There is a blockage
+        }
+        checkFile += fileDirection;
+        checkRank += rankDirection;
+    }
+    return true;
+}
+
+/*NEEDS MORE TESTING*/
+bool validQueenMove (Piece *board[8][8], unsigned int startFileIndex, unsigned int startRankIndex, unsigned char endFileIndex, unsigned int endRankIndex) {
+
+    /* check if ranke and file difference are the same, if not return false*/
+    int fileDiff = (int)endFileIndex - (int)startFileIndex;
+    int rankDiff = (int)endRankIndex - (int)startRankIndex;
+
+    if(rankDiff != fileDiff) return false;
+
+    int rankDirection = (endRankIndex > startRankIndex) ? 1 : (endRankIndex < startRankIndex) ? -1 : 0;
+    int fileDirection = (endFileIndex > startFileIndex) ? 1 : (endFileIndex < startFileIndex) ? -1 : 0;
+
+    // Check for blockages in the path
+    unsigned int checkFile = startFileIndex + fileDirection;
+    unsigned int checkRank = startRankIndex + rankDirection;
+    while (checkFile != endFileIndex || checkRank != endRankIndex) {
+        if (board[checkRank][checkFile] != NULL) {
+            return false; // There is a blockage
+        }
+        checkFile += fileDirection;
+        checkRank += rankDirection;
+    }
+    return true;
+}
+
+bool validKnightMove (unsigned int startFileIndex, unsigned int startRankIndex, unsigned char endFileIndex, unsigned int endRankIndex) {
+    int fileDiff = abs((int)endFileIndex - (int)startFileIndex);
+    int rankDiff = abs((int)endRankIndex - (int)startRankIndex);
+    return ((rankDiff == 2 && fileDiff == 1) || (rankDiff == 1 && fileDiff == 2));
+}
 static unsigned int fileToIndex(unsigned char File) {
     unsigned int h = File - 'a';
     return h;
