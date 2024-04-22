@@ -4,6 +4,13 @@
 #define BOARD_H
 #endif
 
+enum gameType 
+{
+    None,
+    PVP,
+    PVC,
+    CVC
+};
 
 enum PlayerColor
 {
@@ -39,6 +46,7 @@ typedef struct
     bool hasMoved;
 
 }Piece;
+
 
 
 /* for initially setting pieces */
