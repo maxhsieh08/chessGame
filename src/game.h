@@ -1,15 +1,32 @@
 #ifndef GAME_H
 #define GAME_H
-#endif
 #include "board.h"
 
+//testing for ai
+typedef struct 
+{
+    unsigned int startRank;
+    unsigned char startFile;
+    unsigned int endRank;
+    unsigned char endFile;
+    unsigned char moveValue;
+    Piece *endPtr;
+}Moves;
 
 
-bool movePiece(Piece *board[8][8], enum PlayerColor currentPlayer, enum PlayerColor playerOne, unsigned int startFile, unsigned int startRank, unsigned int endFile, unsigned int endRank);
-bool isValidMove(Piece *board[8][8], enum PlayerColor currentPlayer, unsigned int startFileIndex, unsigned int startRankIndex, unsigned char endFileIndex, unsigned int endRankIndex);
-bool validPawnMove(Piece *board[8][8], enum PlayerColor currentPlayer, enum PlayerColor playerOne, unsigned int startFileIndex, unsigned int startRankIndex, unsigned char endFileIndex, unsigned int endRankIndex);
-bool validRookMove(Piece *board[8][8], unsigned int startFileIndex, unsigned int startRankIndex, unsigned char endFileIndex, unsigned int endRankIndex);
-bool validBishopMove (Piece *board[8][8], unsigned int startFileIndex, unsigned int startRankIndex, unsigned char endFileIndex, unsigned int endRankIndex);
-bool validQueenMove (Piece *board[8][8], unsigned int startFileIndex, unsigned int startRankIndex, unsigned char endFileIndex, unsigned int endRankIndex);
+// end testing for ai
+
+bool isValidMove(Piece *board[MAX_FILE][MAX_RANK], enum PlayerColor currentPlayer, Moves *input);
+void movePiece (Piece *board[MAX_FILE][MAX_RANK], Moves *input, bool checking);
+bool checkSpace(Piece *board[MAX_FILE][MAX_RANK], enum PlayerColor currentPlayer, unsigned int startFileIndex, unsigned int startRankIndex, unsigned char endFileIndex, unsigned int endRankIndex);
+bool validPawnMove(Piece *board[MAX_FILE][MAX_RANK], unsigned int startFileIndex, unsigned int startRankIndex, unsigned char endFileIndex, unsigned int endRankIndex);
+bool validRookMove(Piece *board[MAX_FILE][MAX_RANK], unsigned int startFileIndex, unsigned int startRankIndex, unsigned char endFileIndex, unsigned int endRankIndex);
+bool validBishopMove (Piece *board[MAX_FILE][MAX_RANK], unsigned int startFileIndex, unsigned int startRankIndex, unsigned char endFileIndex, unsigned int endRankIndex);
+bool validQueenMove (Piece *board[MAX_FILE][MAX_RANK], unsigned int startFileIndex, unsigned int startRankIndex, unsigned char endFileIndex, unsigned int endRankIndex);
 bool validKnightMove (unsigned int startFileIndex, unsigned int startRankIndex, unsigned char endFileIndex, unsigned int endRankIndex);
-bool validKingMove(unsigned int startFileIndex, unsigned int startRankIndex, unsigned char endFileIndex, unsigned int endRankIndex);
+bool validKingMove(Piece *board[MAX_FILE][MAX_RANK], unsigned int startFileIndex, unsigned int startRankIndex, unsigned char endFileIndex, unsigned int endRankIndex, bool canCastle);
+bool isSafe(Piece *board[MAX_FILE][MAX_RANK], enum PlayerColor currentPlayer, unsigned int fileIndex, unsigned int rankIndex);
+void convertCoordinates (Moves *input);
+Moves *createNewMove();
+// bool isCheck(Piece *board[MAX_FILE][MAX_RANK], enum PlayerColor playerOne, unsigned int fileIndex, unsigned int rankIndex);
+#endif

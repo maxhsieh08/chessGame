@@ -1,22 +1,15 @@
-#include <stdbool.h>
-
 #ifndef BOARD_H
 #define BOARD_H
-#endif
+#include <stdbool.h>
 
-enum gameType 
-{
-    None,
-    PVP,
-    PVC,
-    CVC
-};
+
+
 
 enum PlayerColor
 {
     noColor,
-    black,
     white,
+    black
 
 };
 
@@ -43,17 +36,27 @@ typedef struct
     bool castle;
     int takeable[16]; /*can determine which piece is attacking the concerning piece*/
     unsigned char id;
-    bool hasMoved;
+    unsigned int hasMoved;
+    bool inCheck;
 
 }Piece;
 
-
+enum gameType 
+{
+    None,
+    PVP,
+    PVC,
+    CVC
+};
 
 /* for initially setting pieces */
-void initializeBoard(Piece *board[8][8], enum PlayerColor p1Color);
+void initializeBoard(Piece *board[MAX_FILE][MAX_RANK]);
 
 /* Displaying the board in the terminal*/
-void displayBoard(Piece *board[8][8]);
+void displayBoard(Piece *board[MAX_FILE][MAX_RANK], enum PlayerColor currentPlayer);
 
 /* Flipping orientation of board for Human vs Human play*/
-void flipBoard(Piece *board[8][8]);
+void flipBoard(Piece *board[MAX_FILE][MAX_RANK]);
+
+void  deletePiece(Piece *e);
+#endif
