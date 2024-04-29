@@ -167,7 +167,7 @@ bool validRookMove(Piece *board[8][8], unsigned int startFileIndex, unsigned int
     }
     return true;
 }
-/*NEEDS MORE TESTING*/
+
 bool validBishopMove (Piece *board[8][8], unsigned int startFileIndex, unsigned int startRankIndex, unsigned char endFileIndex, unsigned int endRankIndex) {
     if (startFileIndex == endFileIndex || startRankIndex == endRankIndex) return false;
 
@@ -194,7 +194,7 @@ bool validBishopMove (Piece *board[8][8], unsigned int startFileIndex, unsigned 
     return true;
 }
 
-/*NEEDS MORE TESTING*/
+
 bool validQueenMove (Piece *board[8][8], unsigned int startFileIndex, unsigned int startRankIndex, unsigned char endFileIndex, unsigned int endRankIndex) {
 
     /* check if ranke and file difference are the same, if not return false*/
